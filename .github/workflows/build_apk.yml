@@ -1,16 +1,6 @@
 name: Build LocalSend APK
 
-on:
-  workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-          - debug
-          - release
+on: [workflow_dispatch]
 
 env:
   FLUTTER_VERSION: "3.38.10"
@@ -50,19 +40,13 @@ jobs:
         working-directory: ${{ env.APK_BUILD_DIR }}/app
         run: flutter pub get
 
-      - name: Build APK (debug)
-        if: ${{ github.event.inputs.build_type == 'debug' }}
+      - name: Build APK
         working-directory: ${{ env.APK_BUILD_DIR }}/app
         run: flutter build apk --debug --no-android-gradle-daemon
-
-      - name: Build APK (release)
-        if: ${{ github.event.inputs.build_type == 'release' }}
-        working-directory: ${{ env.APK_BUILD_DIR }}/app
-        run: flutter build apk --split-per-abi --no-android-gradle-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
         with:
-          name: localsend-apk-${{ github.event.inputs.build_type }}
+          name: localsend-apk
           path: |
             ${{ env.APK_BUILD_DIR }}/app/build/app/outputs/flutter-apk/*.apk
